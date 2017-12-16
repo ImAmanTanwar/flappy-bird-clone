@@ -23,7 +23,7 @@ public class FlappyBird extends ApplicationAdapter {
 	float birdY = 0;
 	float velocity = 0;
 	int flapState = 0;
-	float gravity = 2.5f;
+	float gravity = 1.5f;
 	int gameState = 0;
 	int score = 0;
 	int passingTube = 0;
@@ -83,7 +83,7 @@ public class FlappyBird extends ApplicationAdapter {
 				passingTube = (passingTube + 1) % numberOfTubes;
 			}
 			if(Gdx.input.justTouched()) {
-				velocity = -40;
+				velocity = -25;
 			}
 			for(int i=0;i<numberOfTubes;i++) {
 				if(tubeX[i] < -bottomTube.getWidth()) {
