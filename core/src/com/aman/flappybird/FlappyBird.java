@@ -2,6 +2,7 @@ package com.aman.flappybird;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,6 +21,7 @@ public class FlappyBird extends ApplicationAdapter {
 	Texture[] birds;
 	Texture topTube;
 	Texture bottomTube;
+	boolean firstTime = true;
 	float birdY = 0;
 	float velocity = 0;
 	int flapState = 0;
@@ -39,6 +41,10 @@ public class FlappyBird extends ApplicationAdapter {
 	Circle birdBody;
 	Rectangle[] upperTubeBody = new Rectangle[numberOfTubes];
 	Rectangle[] lowerTubeBody = new Rectangle[numberOfTubes];
+	Sound point;
+	Sound tapSound;
+	Sound hitSound;
+	Sound gameOver;
 
 	@Override
 	public void create () {
@@ -56,6 +62,10 @@ public class FlappyBird extends ApplicationAdapter {
 	//	maxTubeOffset = Gdx.graphics.getHeight() /2 - gap/2 - 100;
 		random = new Random();
 		distanceBetweenTubes = Gdx.graphics.getWidth() * 0.62f;
+		point = Gdx.audio.newSound(Gdx.files.internal("sfx_point.wav"));
+		tapSound = Gdx.audio.newSound(Gdx.files.internal("sfx_swooshing.wav"));
+		hitSound = Gdx.audio.newSound(Gdx.files.internal("sfx_hit.wav"));
+		gameOver = Gdx.audio.newSound(Gdx.files.internal("sfx_die.wav"));
 		startGame();
 	}
 
@@ -79,11 +89,13 @@ public class FlappyBird extends ApplicationAdapter {
 
 			if(tubeX[passingTube] < Gdx.graphics.getWidth()/2 - topTube.getWidth()) {
 				score++;
+				point.play();
 				Gdx.app.log("score",  ""+score);
 				passingTube = (passingTube + 1) % numberOfTubes;
 			}
 			if(Gdx.input.justTouched()) {
 				velocity = -25;
+				tapSound.play();
 			}
 			for(int i=0;i<numberOfTubes;i++) {
 				if(tubeX[i] < -bottomTube.getWidth()) {
@@ -107,6 +119,8 @@ public class FlappyBird extends ApplicationAdapter {
 			}
 			else {
 				gameState = 2;
+				hitSound.play();
+				gameOver.play();
 			}
 		}
 		else if (gameState == 0) {
@@ -115,12 +129,18 @@ public class FlappyBird extends ApplicationAdapter {
 			}
 		}
 		else if(gameState == 2) {
+			if(firstTime) {
+				hitSound.play();
+				gameOver.play();
+				firstTime = false;
+			}
 			bitmapFont.draw(batch,"GAME OVER",100,Gdx.graphics.getHeight()/2);
 			if(Gdx.input.justTouched()) {
 				gameState = 1;
 				score = 0;
 				velocity = 0;
 				passingTube = 0;
+				firstTime = true;
 				startGame();
 			}
 		}
