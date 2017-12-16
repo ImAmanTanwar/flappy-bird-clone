@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
@@ -24,9 +25,12 @@ public class FlappyBird extends ApplicationAdapter {
 	int flapState = 0;
 	float gravity = 2.5f;
 	int gameState = 0;
+	int score = 0;
+	int passingTube = 0;
 	float gap = 400;
 	Random random;
 	float tubeVelocity = 4;
+	BitmapFont bitmapFont;
 //	float maxTubeOffset;
 	int numberOfTubes = 4;
 	float[] tubeX = new float[numberOfTubes];
@@ -47,6 +51,9 @@ public class FlappyBird extends ApplicationAdapter {
 		bottomTube = new Texture("bottomtube.png");
 		birdBody = new Circle();
 		birdY = Gdx.graphics.getHeight()/2 - birds[0].getHeight()/2;
+		bitmapFont = new BitmapFont();
+		bitmapFont.setColor(Color.RED);
+		bitmapFont.getData().setScale(10);
 	//	maxTubeOffset = Gdx.graphics.getHeight() /2 - gap/2 - 100;
 		random = new Random();
 		distanceBetweenTubes = Gdx.graphics.getWidth() * 0.62f;
@@ -67,7 +74,11 @@ public class FlappyBird extends ApplicationAdapter {
 
 		if (gameState != 0) {
 
-
+			if(tubeX[passingTube] < Gdx.graphics.getWidth()/2 - topTube.getWidth()) {
+				score++;
+				Gdx.app.log("score",  ""+score);
+				passingTube = (passingTube + 1) % numberOfTubes;
+			}
 			if(Gdx.input.justTouched()) {
 				velocity = -40;
 			}
@@ -78,6 +89,7 @@ public class FlappyBird extends ApplicationAdapter {
 				}
 				else {
 					tubeX[i] = tubeX[i] - tubeVelocity;
+
 				}
 				batch.draw(topTube, tubeX[i], Gdx.graphics.getHeight() / 2 + gap / 2 + tubeOffset[i]);
 				batch.draw(bottomTube, tubeX[i], Gdx.graphics.getHeight() / 2 - gap / 2 - bottomTube.getHeight() + tubeOffset[i]);
@@ -99,11 +111,12 @@ public class FlappyBird extends ApplicationAdapter {
 		}
 		flapState = (flapState + 1) % 2;
 		batch.draw(birds[flapState], Gdx.graphics.getWidth() / 2 - birds[flapState].getWidth() / 2, birdY);
+		bitmapFont.draw(batch,String.valueOf(score),100,Gdx.graphics.getHeight()-100);
 		batch.end();
 		birdBody.set(Gdx.graphics.getWidth()/2,birdY + birds[flapState].getHeight() / 2,birds[flapState].getWidth()/2);
 		for(int i = 0;i< numberOfTubes; i++) {
 			if(Intersector.overlaps(birdBody,upperTubeBody[i]) || Intersector.overlaps(birdBody,lowerTubeBody[i])) {
-				Gdx.app.log("Collison","True");
+
 			}
 		}
 	}
